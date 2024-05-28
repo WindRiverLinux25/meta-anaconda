@@ -7,9 +7,9 @@ SRC_URI:append:anaconda = " \
 "
 
 do_install:append:anaconda() {
-    install -m 0755 ${WORKDIR}/union-fs ${D}/init.d/91-union-fs
-    install -m 0755 ${WORKDIR}/realroot ${D}/init.d/92-realroot
-    install -m 0755 ${WORKDIR}/umountfs ${D}/init.d/93-umountfs
+    install -m 0755 ${UNPACKDIR}/union-fs ${D}/init.d/91-union-fs
+    install -m 0755 ${UNPACKDIR}/realroot ${D}/init.d/92-realroot
+    install -m 0755 ${UNPACKDIR}/umountfs ${D}/init.d/93-umountfs
 }
 
 FILES:${PN}:append:anaconda = " \

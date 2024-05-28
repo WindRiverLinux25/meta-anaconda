@@ -93,12 +93,12 @@ do_configure:prepend() {
 
 do_install:append() {
     mkdir -p ${D}${datadir}/anaconda/post-scripts
-    install -m 644 ${WORKDIR}/81-edit-sudoers.ks ${D}${datadir}/anaconda/post-scripts
-    install -m 644 ${WORKDIR}/81-systemd-preset-all.ks ${D}${datadir}/anaconda/post-scripts
-    install -m 644 ${WORKDIR}/81-add-env-file-for-sshd.ks ${D}${datadir}/anaconda/post-scripts
+    install -m 644 ${UNPACKDIR}/81-edit-sudoers.ks ${D}${datadir}/anaconda/post-scripts
+    install -m 644 ${UNPACKDIR}/81-systemd-preset-all.ks ${D}${datadir}/anaconda/post-scripts
+    install -m 644 ${UNPACKDIR}/81-add-env-file-for-sshd.ks ${D}${datadir}/anaconda/post-scripts
     install -m 644 ${S}/widgets/src/resources/*.svg ${D}${datadir}/anaconda/pixmaps
     install -m 644 ${S}/widgets/src/resources/*.png ${D}${datadir}/anaconda/pixmaps
-    install -m 644 ${WORKDIR}/fedora.css ${D}${datadir}/anaconda/pixmaps
+    install -m 644 ${UNPACKDIR}/fedora.css ${D}${datadir}/anaconda/pixmaps
 }
 
 python __anonymous () {

@@ -9,7 +9,8 @@ SRC_URI = "file://anaconda-init \
            file://Xusername \
            file://COPYING"
 
-S = "${WORKDIR}"
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -35,7 +36,7 @@ CLEANBROKEN = "1"
 
 do_install() {
     install -d ${D}/${sbindir}
-    install -m 0755 ${WORKDIR}/anaconda-init ${D}${sbindir}/anaconda-init
+    install -m 0755 ${S}/anaconda-init ${D}${sbindir}/anaconda-init
     if [ -n "${EULA_DIR}" ]; then
         sed -i "s#@EULA_DIR@#${EULA_DIR}#g" ${D}${sbindir}/anaconda-init
     else
@@ -47,9 +48,9 @@ do_install() {
     install -d ${D}/${sysconfdir}/init.d
     ln -sf ${sbindir}/anaconda-init ${D}/${sysconfdir}/init.d/anaconda-init
     install -d ${D}${systemd_unitdir}/system
-    install -m 0644 ${WORKDIR}/anaconda-init.service \
-                    ${WORKDIR}/anaconda-init-screen@.service \
-                    ${WORKDIR}/anaconda-init.target \
+    install -m 0644 ${S}/anaconda-init.service \
+                    ${S}/anaconda-init-screen@.service \
+                    ${S}/anaconda-init.target \
                ${D}${systemd_unitdir}/system
 
 
