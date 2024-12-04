@@ -16,7 +16,6 @@ RDEPENDS:${PN} = " \
     efibootmgr \
     kmod \
     lvm2 \
-    lvm2-udevrules \
     util-linux-mount \
     util-linux-switch-root \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libuser', '', d)} \
