@@ -73,6 +73,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedor
            file://0085-catch-all-exceptions-for-screensaver-inhibition.patch \
            file://0086-The-RPM-tooling-generates-the-compiled-python-so-hav.patch \
            file://0087-storage-Remove-support-for-NVDIMM-namespaces.patch \
+           file://0088-Use-the-standalone-crypt_r-package-on-Fedora-41.patch \
            "
 
 SRCREV = "1a4aed721074ddcd84df88089024378c894ec65e"
@@ -169,6 +170,7 @@ RDEPENDS:${PN} = "bash \
                   python3-blivetgui \
                   python3-core \
                   python3-coverage \
+                  python3-crypt-r \
                   python3-dasbus \
                   python3-langtable \
                   python3-libreport \

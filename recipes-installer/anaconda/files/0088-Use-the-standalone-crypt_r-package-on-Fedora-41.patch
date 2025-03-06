@@ -1,0 +1,179 @@
+From 1c4d063d4c530e5f76c7ee0ff33d95752b842f52 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Miro=20Hron=C4=8Dok?= <miro@hroncok.cz>
+Date: Tue, 30 Apr 2024 14:38:33 +0200
+Subject: [PATCH] Use the standalone crypt_r package on Fedora 41+
+
+Explicit is better than implicit, so let's use the crypt_r Python module as well.
+
+The package is only required on F41+ in the spec,
+hence we allow a fallback to stdlib's crypt.
+
+Resolves: https://bugzilla.redhat.com/2276036
+
+Upstream-Status: Backport [https://github.com/rhinstaller/anaconda/commit/1c4d063]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ anaconda.spec.in                                   |  3 +++
+ docs/release-notes/crypt_r.rst                     | 12 ++++++++++++
+ pyanaconda/core/users.py                           | 14 ++++++++++----
+ pyanaconda/modules/common/structures/user.py       |  4 ++--
+ .../pyanaconda_tests/core/test_user_create.py      | 14 +++++++++-----
+ 5 files changed, 36 insertions(+), 11 deletions(-)
+ create mode 100644 docs/release-notes/crypt_r.rst
+
+diff --git a/anaconda.spec.in b/anaconda.spec.in
+index 1fde175d4a..709082a095 100644
+--- a/anaconda.spec.in
++++ b/anaconda.spec.in
+@@ -84,6 +84,9 @@ Summary: Core of the Anaconda installer
+ # core/signal.py is under MIT
+ License: GPL-2.0-or-later AND MIT
+ Requires: python3-libs
++%if 0%{?rhel} > 10 || 0%{?fedora} > 40
++Requires: python3-crypt-r
++%endif
+ Requires: python3-dnf >= %{dnfver}
+ Requires: python3-blivet >= %{pythonblivetver}
+ Requires: python3-blockdev >= %{libblockdevver}
+diff --git a/docs/release-notes/crypt_r.rst b/docs/release-notes/crypt_r.rst
+new file mode 100644
+index 0000000000..dccc1dd063
+--- /dev/null
++++ b/docs/release-notes/crypt_r.rst
+@@ -0,0 +1,12 @@
++:Type: Core
++:Summary: Use the standalone ``crypt_r`` package for crypting passwords (rhbz#2276036)
++
++:Description:
++    The Python standard library ``crypt`` module was removed from Python 3.13+.
++    Use the standalone ``crypt_r`` package maintained by the Fedora Python SIG instead.
++    Support for ``crypt`` still exists as a fallback, as ``crypt_r`` is not
++    available in old RHELs and Fedoras.
++
++:Links:
++    - https://bugzilla.redhat.com/2276036
++    - https://github.com/rhinstaller/anaconda/pull/5628
+diff --git a/pyanaconda/core/users.py b/pyanaconda/core/users.py
+index eb088ee659..cd9b44508b 100644
+--- a/pyanaconda/core/users.py
++++ b/pyanaconda/core/users.py
+@@ -28,11 +28,17 @@ from pyanaconda.core.path import make_directories, open_with_perm
+ from pyanaconda.core.string import strip_accents
+ from pyanaconda.core.regexes import GROUPLIST_FANCY_PARSE, NAME_VALID, PORTABLE_FS_CHARS, \
+     GROUPLIST_SIMPLE_VALID
+-import crypt  # pylint: disable=deprecated-module
+ from pyanaconda.core.i18n import _
+ import re
+ from random import SystemRandom as sr
+ 
++try:
++    # Use the standalone (not deprecated) package when available
++    import crypt_r
++except ImportError:
++    # Fallback to the deprecated standard library module
++    import crypt as crypt_r  # pylint: disable=deprecated-module
++
+ from pyanaconda.anaconda_loggers import get_module_logger
+ log = get_module_logger(__name__)
+ 
+@@ -53,17 +59,17 @@ def crypt_password(password):
+ 
+     # and try to compute the password hash using our yescrypt setting
+     try:
+-        cryptpw = crypt.crypt(password, setting)
++        cryptpw = crypt_r.crypt(password, setting)
+ 
+     # Fallback to sha512crypt, if yescrypt is not supported
+     except OSError:
+         log.info("yescrypt is not supported, falling back to sha512crypt")
+         try:
+-            cryptpw = crypt.crypt(password, crypt.METHOD_SHA512)
++            cryptpw = crypt_r.crypt(password, crypt_r.METHOD_SHA512)
+         except OSError as exc:
+             raise RuntimeError(_(
+                 "Unable to encrypt password: unsupported "
+-                "algorithm {}").format(crypt.METHOD_SHA512)
++                "algorithm {}").format(crypt_r.METHOD_SHA512)
+             ) from exc
+ 
+     return cryptpw
+diff --git a/pyanaconda/modules/common/structures/user.py b/pyanaconda/modules/common/structures/user.py
+index 155cd5ca5d..ce153f2b32 100644
+--- a/pyanaconda/modules/common/structures/user.py
++++ b/pyanaconda/modules/common/structures/user.py
+@@ -234,7 +234,7 @@ class UserData(DBusData):
+ 
+         To create an encrypted password you can use python:
+ 
+-        python3 -c 'import crypt; print(crypt.crypt("My Password", "$y$j9T$My Sault"))'
++        python3 -c 'import crypt_r; print(crypt_r.crypt("My Password", "$y$j9T$My Sault"))'
+ 
+         This will compute a hash of your password using the yescrypt hasing method and
+         your provided salt.
+@@ -242,7 +242,7 @@ class UserData(DBusData):
+         If the yescrypt method is not supported by your system, you can use the
+         sha512crypt hashing method:
+ 
+-        python3 -c 'import crypt; print(crypt.crypt("My Password", "$6$My Sault"))'
++        python3 -c 'import crypt_r; print(crypt_r.crypt("My Password", "$6$My Sault"))'
+ 
+         This will compute a hash of your password using the sha512crypt hasing method
+         and your provided salt.
+diff --git a/tests/unit_tests/pyanaconda_tests/core/test_user_create.py b/tests/unit_tests/pyanaconda_tests/core/test_user_create.py
+index efaba315b8..5049edcf28 100644
+--- a/tests/unit_tests/pyanaconda_tests/core/test_user_create.py
++++ b/tests/unit_tests/pyanaconda_tests/core/test_user_create.py
+@@ -22,9 +22,13 @@ from unittest.mock import patch
+ import tempfile
+ import shutil
+ import os
+-import crypt  # pylint: disable=deprecated-module
+ import pytest
+ 
++try:
++    import crypt_r
++except ImportError:
++    import crypt as crypt_r  # pylint: disable=deprecated-module
++
+ from pyanaconda.core import users
+ from pyanaconda.core.path import make_directories, touch
+ 
+@@ -192,7 +196,7 @@ class UserCreateTest(unittest.TestCase):
+         shadow_fields = self._readFields("/etc/shadow", "test_user1")
+         assert shadow_fields is not None
+         # Make sure the password works
+-        assert crypt.crypt("password", shadow_fields[1]) == shadow_fields[1]
++        assert crypt_r.crypt("password", shadow_fields[1]) == shadow_fields[1]
+ 
+         # Set the encrypted password for another user with is_crypted
+         cryptpw = shadow_fields[1]
+@@ -221,7 +225,7 @@ class UserCreateTest(unittest.TestCase):
+         shadow_fields = self._readFields("/etc/shadow", "test_user2")
+         assert shadow_fields is not None
+         assert shadow_fields[1].startswith("!")
+-        assert crypt.crypt("password", shadow_fields[1][1:]) == shadow_fields[1][1:]
++        assert crypt_r.crypt("password", shadow_fields[1][1:]) == shadow_fields[1][1:]
+ 
+     def test_create_user_uid(self):
+         """Create a user with a specific UID."""
+@@ -300,14 +304,14 @@ class UserCreateTest(unittest.TestCase):
+ 
+         users.set_root_password(password, root=self.tmpdir)
+         shadow_fields = self._readFields("/etc/shadow", "root")
+-        assert crypt.crypt(password, shadow_fields[1]) == shadow_fields[1]
++        assert crypt_r.crypt(password, shadow_fields[1]) == shadow_fields[1]
+ 
+         # Try a different password with lock=True
+         password = "password2"
+         users.set_root_password(password, lock=True, root=self.tmpdir)
+         shadow_fields = self._readFields("/etc/shadow", "root")
+         assert shadow_fields[1].startswith("!")
+-        assert crypt.crypt(password, shadow_fields[1][1:]) == shadow_fields[1][1:]
++        assert crypt_r.crypt(password, shadow_fields[1][1:]) == shadow_fields[1][1:]
+ 
+         # Try an encrypted password
+         password = "$1$asdf$password"
+-- 
+2.47.1
+
