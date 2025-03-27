@@ -25,5 +25,7 @@ RDEPENDS:packagegroup-installer-x11-anaconda = "\
     adwaita-icon-theme \
     pango \
     pango-modules \
-    createrepo-c"
+    createrepo-c \
+    gobject-introspection \
+"
 
