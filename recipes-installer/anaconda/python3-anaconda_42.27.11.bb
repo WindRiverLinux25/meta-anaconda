@@ -4,11 +4,12 @@ HOMEPAGE = "http://fedoraproject.org/wiki/Anaconda"
 LICENSE = "GPL-2.0-only"
 SECTION = "devel"
 
-LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
+# * 7ae48f73b8 Update FSF address
+LIC_FILES_CHKSUM = "file://COPYING;md5=d43102ae4c9673c8c59739e37a2f198a"
 
-DEPENDS = "gdk-pixbuf-native e2fsprogs gettext glade libxklavier rpm"
+DEPENDS = "gdk-pixbuf-native glade rpm"
 
-SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedora-39 \
+SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedora-42 \
            file://fedora.css \
            file://81-edit-sudoers.ks \
            file://81-systemd-preset-all.ks \
@@ -23,7 +24,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedor
            file://0012-bootloader.py-Change-grub2-settings-to-match-oe-core.patch \
            file://0013-tweak-detect-kernel-version.patch \
            file://0016-kickstart-not-support-Authselect-Firewall-Firstboot.patch \
-           file://0017-invisible-help-button.patch \
            file://0018-disable-non-implemented-functions.patch \
            file://0019-support-UEFI-boot.patch \
            file://0022-fix-quoted-empty-string-failed.patch \
@@ -32,7 +32,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedor
            file://0025-tweak-bootloader-fs-type.patch \
            file://0026-support-timezone-setting.patch \
            file://0028-do-not-support-manually-set-time.patch \
-           file://0030-detect-existence-of-Xorg.patch \
            file://0033-text-repository-setting-do-not-support-local-ISO-fil.patch \
            file://0034-text-repository-setting-support-http-proxy.patch \
            file://0036-do-not-support-network-setting-for-now.patch \
@@ -71,13 +70,9 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedor
            file://0083-reset-default-autopart-type.patch \
            file://0084-conf-system-not-livecd.patch \
            file://0085-catch-all-exceptions-for-screensaver-inhibition.patch \
-           file://0086-The-RPM-tooling-generates-the-compiled-python-so-hav.patch \
-           file://0087-storage-Remove-support-for-NVDIMM-namespaces.patch \
-           file://0088-Use-the-standalone-crypt_r-package-on-Fedora-41.patch \
-           file://0089-Do-not-use-stringize-and-unicodeize-from-Blivet.patch \
            "
 
-SRCREV = "1a4aed721074ddcd84df88089024378c894ec65e"
+SRCREV = "b42eeabf535c3cf61ca8fafee7c21a156e650c74"
 
 S = "${WORKDIR}/git"
 
@@ -114,24 +109,17 @@ COMPATIBLE_HOST:armv7ve = 'null'
 
 FILES:${PN}-dbg += "${libexecdir}/anaconda/.debug ${PYTHON_SITEPACKAGES_DIR}/pyanaconda/.debug"
 FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/pyanaconda/_isys.a"
-FILES:${PN} = "\
-               ${PYTHON_SITEPACKAGES_DIR}/pyanaconda \
+FILES:${PN} = "${PYTHON_SITEPACKAGES_DIR}/pyanaconda \
                ${bindir} \
                ${datadir}/anaconda \
                ${datadir}/applications \
                ${datadir}/glade \
                ${datadir}/polkit-1 \
-               ${datadir}/themes \
                ${libdir} \
                ${libexecdir} \
                ${sbindir} \
                ${sysconfdir} \
                "
-
-PACKAGES += "${PN}-misc"
-FILES:${PN}-misc = "/usr/lib"
-
-RDEPENDS:${PN}-misc += "bash python3-core"
 
 RDEPENDS:${PN} = "bash \
                   btrfs-tools \
@@ -155,10 +143,8 @@ RDEPENDS:${PN} = "bash \
                   isomd5sum \
                   keybinder \
                   libarchive \
-                  libgnomekbd \
                   libpwquality \
                   librsvg-gtk \
-                  libtimezonemap \
                   libxkbcommon \
                   localedef \
                   mdadm \
@@ -172,12 +158,16 @@ RDEPENDS:${PN} = "bash \
                   python3-core \
                   python3-coverage \
                   python3-crypt-r \
+                  python3-crypt-r \
                   python3-dasbus \
+                  python3-dbus-next \
+                  python3-iso639 \
                   python3-langtable \
                   python3-libreport \
                   python3-meh \
                   python3-ntplib \
                   python3-ordered-set \
+                  python3-pam \
                   python3-productmd \
                   python3-pytz \
                   python3-requests-file \
@@ -185,10 +175,10 @@ RDEPENDS:${PN} = "bash \
                   python3-simpleline \
                   python3-systemd \
                   python3-wrapt \
+                  python3-xkbregistry \
                   python3-zoneinfo \
                   rsync \
                   squashfs-tools \
-                  tigervnc \
                   tzdata \
                   usermode \
                   util-linux \
