@@ -197,7 +197,7 @@ FOE
                losetup -r $ROOT_IMAGE_DEV $ROOT_IMAGE
                [ $? -eq 0 ] || exit 1
            fi
-           anaconda_opts="$anaconda_opts --liveinst --method=livecd:$ROOT_IMAGE_DEV"
+           anaconda_opts="$anaconda_opts --liveinst --repo=cdrom:$ROOT_IMAGE_DEV"
        elif [ -n "$liveinst" ]; then
                echo "ERROR: no $ROOT_IMAGE" >&2
                exit 1
