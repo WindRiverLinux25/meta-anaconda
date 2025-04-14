@@ -14,15 +14,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 37.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Fix patch-fuzz error for anaconda 42 on 20250414.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/argument_parsing.py | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/argument_parsing.py b/pyanaconda/argument_parsing.py
-index fc23edd2f3..f5a747126d 100644
+index e24f0f1b99..e825a9b14c 100644
 --- a/pyanaconda/argument_parsing.py
 +++ b/pyanaconda/argument_parsing.py
-@@ -482,7 +482,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
+@@ -490,7 +490,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
  
      ap.add_argument("--addrepo", dest="addRepo", default=[], metavar="NAME,ADDITIONAL_REPO_URL",
                      action=ParseAddRepo, help=help_parser.help_text("addrepo"))
@@ -31,8 +35,8 @@ index fc23edd2f3..f5a747126d 100644
                      help=help_parser.help_text("noverifyssl"))
      ap.add_argument("--liveinst", action="store_true", default=False,
                      help=help_parser.help_text("liveinst"))
-@@ -515,7 +515,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
-     from pykickstart.constants import SELINUX_DISABLED, SELINUX_ENFORCING
+@@ -521,7 +521,7 @@ def getArgumentParser(version_string, boot_cmdline=None):
+ 
      from pyanaconda.core.constants import SELINUX_DEFAULT
      ap.add_argument("--noselinux", dest="selinux", action="store_const",
 -                    const=SELINUX_DISABLED, default=SELINUX_DEFAULT,
