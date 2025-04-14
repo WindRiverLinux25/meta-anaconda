@@ -8,17 +8,21 @@ We do not plan to have hard drive partitions to hold an ISO.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 42 on 20250414.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/ui/gui/spokes/installation_source.py | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/pyanaconda/ui/gui/spokes/installation_source.py b/pyanaconda/ui/gui/spokes/installation_source.py
-index 74338aa..6fddfd7 100644
+index 939e221a5e..6cbc547f63 100644
 --- a/pyanaconda/ui/gui/spokes/installation_source.py
 +++ b/pyanaconda/ui/gui/spokes/installation_source.py
-@@ -939,7 +939,8 @@ class SourceSpoke(NormalSpoke, GUISpokeInputCheckHandler):
+@@ -655,7 +655,8 @@ class SourceSpoke(NormalSpoke, GUISpokeInputCheckHandler, SourceSwitchHandler):
+ 
              added = True
-             idx += 1
  
 -        # Again, only display these widgets if an HDISO source was found.
 +        # Do not support an HDISO source.
