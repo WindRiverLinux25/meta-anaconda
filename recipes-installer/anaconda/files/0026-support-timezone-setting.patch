@@ -21,27 +21,34 @@ Rebase for anaconda 37:
 * replace pyanaconda.core.util.mkdirChain with pyanaconda.core.path.make_directories
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 42 on 20250414.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/modules/timezone/installation.py | 26 ++++++++------------------
  1 file changed, 8 insertions(+), 18 deletions(-)
 
 diff --git a/pyanaconda/modules/timezone/installation.py b/pyanaconda/modules/timezone/installation.py
-index 0cd75106c7..600c3407de 100644
+index aacf39ce14..9325364283 100644
 --- a/pyanaconda/modules/timezone/installation.py
 +++ b/pyanaconda/modules/timezone/installation.py
-@@ -17,9 +17,10 @@
+@@ -17,12 +17,13 @@
  #
  import os
  import os.path
 +import shutil
  
+ from blivet import arch
+ 
  from pyanaconda import ntp
+ from pyanaconda.anaconda_loggers import get_module_logger
 -from pyanaconda.core import service, util
 +from pyanaconda.core import service, util, path
  from pyanaconda.core.configuration.anaconda import conf
- from pyanaconda.timezone import NTP_SERVICE
- from pyanaconda.anaconda_loggers import get_module_logger
-@@ -107,6 +108,9 @@ class ConfigureTimezoneTask(Task):
+ from pyanaconda.modules.common.errors.installation import TimezoneConfigurationError
+ from pyanaconda.modules.common.task import Task
+@@ -106,6 +107,9 @@ class ConfigureTimezoneTask(Task):
          rooted_tz_file = os.path.normpath(self._sysroot + tz_file)
          relative_path = os.path.normpath("../" + tz_file)
          link_path = os.path.normpath(self._sysroot + "/etc/localtime")
@@ -51,7 +58,7 @@ index 0cd75106c7..600c3407de 100644
  
          if not os.access(rooted_tz_file, os.R_OK):
              log.error("Timezone to be linked (%s) doesn't exist", rooted_tz_file)
-@@ -133,23 +137,9 @@ class ConfigureTimezoneTask(Task):
+@@ -132,23 +136,9 @@ class ConfigureTimezoneTask(Task):
              # there is no Hardware clock on s390(x)
              return
  
