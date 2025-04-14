@@ -26,23 +26,27 @@ Rebase for anaconda 37.
 * replace pyanaconda.core.util.mkdirChain with pyanaconda.core.path.make_directories
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 42 on 20250328.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/modules/storage/bootloader/utils.py | 19 +++++++++++++++++--
  1 file changed, 17 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/modules/storage/bootloader/utils.py b/pyanaconda/modules/storage/bootloader/utils.py
-index 04b1e5abfd..38fce041a7 100644
+index 786a6b1f82..94fb2cfb37 100644
 --- a/pyanaconda/modules/storage/bootloader/utils.py
 +++ b/pyanaconda/modules/storage/bootloader/utils.py
-@@ -21,6 +21,7 @@ from glob import glob
- from pyanaconda.modules.common.errors.installation import BootloaderInstallationError
- from pyanaconda.modules.storage.bootloader.image import LinuxBootLoaderImage
+@@ -20,6 +20,7 @@ from glob import glob
+ 
+ from pyanaconda.anaconda_loggers import get_module_logger
  from pyanaconda.core.configuration.anaconda import conf
 +from pyanaconda.core.path import make_directories
+ from pyanaconda.core.product import get_product_name
  from pyanaconda.core.util import execWithRedirect
- from pyanaconda.product import productName
- 
-@@ -96,7 +97,7 @@ def configure_boot_loader(sysroot, storage, kernel_versions):
+ from pyanaconda.modules.common.errors.installation import BootloaderInstallationError
+@@ -95,7 +96,7 @@ def configure_boot_loader(sysroot, storage, kernel_versions):
          return
  
      # Collect the boot loader images.
@@ -51,7 +55,7 @@ index 04b1e5abfd..38fce041a7 100644
  
      # Write out /etc/sysconfig/kernel.
      _write_sysconfig_kernel(sysroot, storage)
-@@ -113,7 +114,7 @@ def _get_rescue_kernel_versions(sysroot):
+@@ -112,7 +113,7 @@ def _get_rescue_kernel_versions(sysroot):
      return [f.split("/")[-1][8:] for f in rescue_versions]
  
  
@@ -60,7 +64,7 @@ index 04b1e5abfd..38fce041a7 100644
      """Collect the OS images for the boot loader.
  
      :param storage: an instance of the storage
-@@ -135,6 +136,12 @@ def _collect_os_images(storage, kernel_versions):
+@@ -134,6 +135,12 @@ def _collect_os_images(storage, kernel_versions):
      storage.bootloader.add_image(default_image)
      storage.bootloader.default = default_image
  
@@ -73,7 +77,7 @@ index 04b1e5abfd..38fce041a7 100644
      # now add an image for each of the other kernels
      for version in kernel_versions:
          label = "%s-%s" % (base_label, version)
-@@ -145,6 +152,10 @@ def _collect_os_images(storage, kernel_versions):
+@@ -144,6 +151,10 @@ def _collect_os_images(storage, kernel_versions):
          )
          storage.bootloader.add_image(image)
  
@@ -84,7 +88,7 @@ index 04b1e5abfd..38fce041a7 100644
  
  def _write_sysconfig_kernel(sysroot, storage):
      """Write to /etc/sysconfig/kernel.
-@@ -279,6 +290,10 @@ def recreate_initrds(sysroot, kernel_versions):
+@@ -257,6 +268,10 @@ def recreate_initrds(sysroot, kernel_versions):
          log.debug("new-kernel-pkg does not exist, using dracut instead")
          use_dracut = True
  
