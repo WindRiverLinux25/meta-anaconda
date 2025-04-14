@@ -25,48 +25,61 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 39 on 20240304.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
----
- pyanaconda/product.py               | 4 ++++
- pyanaconda/ui/gui/spokes/welcome.py | 5 +++--
- 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/pyanaconda/product.py b/pyanaconda/product.py
-index 2b680cc9c6..748feaf98f 100644
---- a/pyanaconda/product.py
-+++ b/pyanaconda/product.py
-@@ -72,6 +72,10 @@ productVersion = trim_product_version_for_ui(productVersion)
- 
- 
- def distributionText():
-+    if '(' in productName and ')' in productName:
-+        return _("%(productName)s %(productVersion)s INSTALLATION") % \
-+                 {"productName": productName.split()[0], "productVersion": productVersion}
-+
-     return _("%(productName)s %(productVersion)s INSTALLATION") % {
-         "productName": productName.upper(),
-         "productVersion": productVersion.upper()
+Rebase for anaconda 42 on 20250328.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ pyanaconda/ui/gui/spokes/welcome.py | 4 ++--
+ pyanaconda/ui/helpers.py            | 9 ++++++++-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+
 diff --git a/pyanaconda/ui/gui/spokes/welcome.py b/pyanaconda/ui/gui/spokes/welcome.py
-index a33934c634..42e6237ec7 100644
+index c785f28912..388884cfb0 100644
 --- a/pyanaconda/ui/gui/spokes/welcome.py
 +++ b/pyanaconda/ui/gui/spokes/welcome.py
-@@ -37,7 +37,8 @@ from pyanaconda.product import distributionText, isFinal, productName, productVe
- from pyanaconda import flags
+@@ -37,7 +37,7 @@ from pyanaconda.core.constants import (
  from pyanaconda.core.i18n import _
+ from pyanaconda.core.product import (
+     get_product_is_final_release,
+-    get_product_name,
++    get_product_short_name,
+     get_product_version,
+ )
  from pyanaconda.core.util import ipmi_abort
--from pyanaconda.core.constants import DEFAULT_LANG, WINDOW_TITLE_TEXT, TIMEZONE_PRIORITY_LANGUAGE
-+from pyanaconda.core.constants import DEFAULT_LANG, WINDOW_TITLE_TEXT, \
-+    TIMEZONE_PRIORITY_LANGUAGE, shortProductName
- from pyanaconda.modules.common.constants.services import TIMEZONE, LOCALIZATION
- from pyanaconda.modules.common.util import is_module_available
- from pyanaconda.anaconda_loggers import get_module_logger
-@@ -204,7 +205,7 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
+@@ -212,7 +212,7 @@ class WelcomeLanguageSpoke(StandaloneSpoke, LangLocaleHandler):
          welcomeLabel = self.builder.get_object("welcomeLabel")
  
          welcomeLabel.set_text(_("WELCOME TO %(name)s %(version)s.") %
--                {"name" : productName.upper(), "version" : productVersion})         # pylint: disable=no-member
-+                {"name" : shortProductName.upper(), "version" : productVersion})         # pylint: disable=no-member
+-                {"name" : get_product_name().upper(), "version" : get_product_version()})
++                {"name" : get_product_short_name().upper(), "version" : get_product_version()})
  
          # Retranslate the language (filtering) entry's placeholder text
          languageEntry = self.builder.get_object("languageEntry")
+diff --git a/pyanaconda/ui/helpers.py b/pyanaconda/ui/helpers.py
+index 35adce9cf2..e52e41cd8e 100644
+--- a/pyanaconda/ui/helpers.py
++++ b/pyanaconda/ui/helpers.py
+@@ -61,12 +61,19 @@ from pyanaconda.core.constants import DRACUT_REPO_DIR
+ from pyanaconda.core.i18n import _
+ from pyanaconda.core.path import join_paths
+ from pyanaconda.core.payload import create_hdd_url, create_nfs_url
+-from pyanaconda.core.product import get_product_name, get_product_version
++from pyanaconda.core.product import get_product_name, get_product_short_name, get_product_version
+ from pyanaconda.modules.common.structures.payload import RepoConfigurationData
+ from pyanaconda.ui.lib.payload import create_source, set_source, tear_down_sources
+ 
+ 
+ def get_distribution_text():
++    productName = get_product_name()
++    if '(' in productName and ')' in productName:
++        return _("%(productName)s %(productVersion)s INSTALLATION") % {
++            "productName": get_product_short_name().upper(),
++            "productVersion": get_product_version().upper()
++        }
++
+     return _("%(productName)s %(productVersion)s INSTALLATION") % {
+         "productName": get_product_name().upper(),
+         "productVersion": get_product_version().upper()
 -- 
 2.7.4
