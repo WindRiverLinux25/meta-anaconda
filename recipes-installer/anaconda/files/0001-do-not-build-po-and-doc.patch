@@ -10,6 +10,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebased for Fedora 37.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebased for anaconda 42 on 20250328.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  Makefile.am         | 2 +-
  configure.ac        | 2 --
@@ -17,32 +21,32 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  3 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index c1ed03c03d..609552febd 100644
+index cddc78f5de..3ef9f958e0 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -19,7 +19,7 @@ include ./branch-config.mk
+@@ -20,7 +20,7 @@ include ./po/l10n-config.mk
  
  ACLOCAL_AMFLAGS = -I m4
  
--SUBDIRS = data docs dracut po pyanaconda scripts tests widgets ui utils
-+SUBDIRS = data dracut pyanaconda scripts tests widgets ui utils
+-SUBDIRS = data docs dracut po pyanaconda scripts tests widgets
++SUBDIRS = data dracut pyanaconda scripts tests widgets
  
  EXTRA_DIST = COPYING
  
 diff --git a/configure.ac b/configure.ac
-index 9edcd77da0..39dcc394cc 100644
+index 4ba59c13e7..da4222a87a 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -114,7 +114,6 @@ AC_CONFIG_FILES([Makefile
+@@ -108,7 +108,6 @@ AC_CONFIG_FILES([Makefile
                   anaconda.spec
                   data/Makefile
                   data/command-stubs/Makefile
 -                 docs/Makefile
                   dracut/Makefile
+                  dracut/dd/Makefile
                   data/conf.d/Makefile
-                  data/profile.d/Makefile
-@@ -126,7 +125,6 @@ AC_CONFIG_FILES([Makefile
-                  data/dbus/Makefile
+@@ -121,7 +120,6 @@ AC_CONFIG_FILES([Makefile
+                  data/pam/Makefile
                   data/window-manager/Makefile
                   data/window-manager/config/Makefile
 -                 po/Makefile
@@ -50,15 +54,15 @@ index 9edcd77da0..39dcc394cc 100644
                   pyanaconda/Makefile
                   pyanaconda/version.py
 diff --git a/widgets/Makefile.am b/widgets/Makefile.am
-index 6478ce8764..222aeaac59 100644
+index 2da4157dc5..e5ca3506f1 100644
 --- a/widgets/Makefile.am
 +++ b/widgets/Makefile.am
 @@ -19,7 +19,7 @@
  
  ACLOCAL_AMFLAGS = -I m4
  
--SUBDIRS = src python glade doc
-+SUBDIRS = src python glade
+-SUBDIRS = src python @GLADE_SUBDIR@ doc
++SUBDIRS = src python @GLADE_SUBDIR@
  
  MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in config.sub \
  	configure depcomp install-sh ltmain.sh missing py-compile \
