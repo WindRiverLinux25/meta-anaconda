@@ -14,15 +14,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Rebase for anaconda 37.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 42 on 20250328.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/installation.py | 18 +++++-------------
- 1 file changed, 5 insertions(+), 13 deletions(-)
+ pyanaconda/installation.py | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index 782859360c..0ce48bca8c 100644
+index d215820953..facc40b86a 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -351,10 +351,6 @@ class RunInstallationTask(InstallationTask):
+@@ -405,10 +405,6 @@ class RunInstallationTask(InstallationTask):
          )
          early_storage.append_dbus_tasks(STORAGE, storage_proxy.InstallWithTasks())
  
@@ -33,7 +37,7 @@ index 782859360c..0ce48bca8c 100644
          installation_queue.append(early_storage)
  
          # Run %pre-install scripts with the filesystem mounted and no packages
-@@ -405,15 +401,11 @@ class RunInstallationTask(InstallationTask):
+@@ -478,16 +474,15 @@ class RunInstallationTask(InstallationTask):
          ))
          installation_queue.append(payload_install)
  
@@ -41,13 +45,18 @@ index 782859360c..0ce48bca8c 100644
 -        if payload.type != PAYLOAD_TYPE_DNF:
 -            late_storage = TaskQueue(
 -                "Late storage configuration",
--                _("Configuring storage")
+-                _("Configuring storage"),
+-                CATEGORY_STORAGE,
 -            )
 -            conf_task = storage_proxy.WriteConfigurationWithTask()
 -            late_storage.append_dbus_tasks(STORAGE, [conf_task])
 -            installation_queue.append(late_storage)
 +        # Always write configuration at late storage
-+        late_storage = TaskQueue("Late storage configuration", _("Configuring storage"))
++        late_storage = TaskQueue(
++            "Late storage configuration",
++            _("Configuring storage"),
++            CATEGORY_STORAGE,
++        )
 +        conf_task = storage_proxy.WriteConfigurationWithTask()
 +        late_storage.append_dbus_tasks(STORAGE, [conf_task])
 +        installation_queue.append(late_storage)
