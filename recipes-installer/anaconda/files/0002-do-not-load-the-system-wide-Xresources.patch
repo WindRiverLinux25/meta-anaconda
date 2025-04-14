@@ -20,34 +20,30 @@ The reason is OE does not have spice-vdagent.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for anaconda 42 on 20250328. Function do_extra_x11_actions() has
+been removed, so drop the related modification at same time.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- pyanaconda/display.py | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ pyanaconda/display.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/pyanaconda/display.py b/pyanaconda/display.py
-index 2258f23..7d48d58 100644
+index e0d262c075..7ef61a1a95 100644
 --- a/pyanaconda/display.py
 +++ b/pyanaconda/display.py
-@@ -137,7 +137,7 @@ def start_x11(xtimeout):
+@@ -222,8 +222,8 @@ def do_startup_wl_actions(timeout, headless=False, headless_resolution=None):
+         # headless (remote connection) - stay on VT1 where connection info is
+         argv.extend(["--vt", "1"])
+     else:
+-        # local display - switch to VT6 & show GUI there
+-        argv.extend(["--vt", "6"])
++        # local display - switch to VT7 & show GUI there
++        argv.extend(["--vt", "7"])
  
-     # Start Xorg and wait for it become ready
-     util.startX(["Xorg", "-br", "-logfile", "/tmp/X.log",
--                 ":%s" % constants.X_DISPLAY_NUMBER, "vt6", "-s", "1440", "-ac",
-+                 ":%s" % constants.X_DISPLAY_NUMBER, "vt7", "-s", "1440", "-ac",
-                  "-nolisten", "tcp", "-dpi", "96",
-                  "-noreset"],
-                 output_redirect=subprocess.DEVNULL, timeout=xtimeout)
-@@ -328,8 +328,8 @@ def setup_display(anaconda, options):
-             anaconda.gui_startup_failed = True
-             time.sleep(2)
- 
--        if not anaconda.gui_startup_failed:
--            do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
-+        #if not anaconda.gui_startup_failed:
-+        #    do_extra_x11_actions(options.runres, gui_mode=anaconda.gui_mode)
- 
-     if anaconda.tui_mode and anaconda.gui_startup_failed and flags.vncquestion and not anaconda.ksdata.vnc.enabled:
-         message = _("X was unable to start on your machine. Would you like to start VNC to connect to "
+     # add the generic GNOME Kiosk invocation
+     argv.extend(["gnome-kiosk", "--sm-disable",
 -- 
 2.7.4
 
