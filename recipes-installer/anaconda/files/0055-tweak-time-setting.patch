@@ -18,6 +18,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for anaconda 37.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 42 on 20250328.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  pyanaconda/core/constants.py               | 2 ++
  pyanaconda/ui/gui/spokes/datetime_spoke.py | 2 +-
@@ -25,23 +29,23 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  3 files changed, 4 insertions(+), 7 deletions(-)
 
 diff --git a/pyanaconda/core/constants.py b/pyanaconda/core/constants.py
-index b130f71fd9..70f677f304 100644
+index 59f64a80ae..610fa18e39 100644
 --- a/pyanaconda/core/constants.py
 +++ b/pyanaconda/core/constants.py
-@@ -76,6 +76,8 @@ DEFAULT_KEYBOARD = "us"
+@@ -82,6 +82,8 @@ DEFAULT_KEYBOARD = "us"
  
  DRACUT_SHUTDOWN_EJECT = "/run/initramfs/usr/lib/dracut/hooks/shutdown/99anaconda-eject.sh"
  
 +DEFAULT_TZ = "America/New_York"
 +
- # VNC questions
- USEVNC = N_("Start VNC")
+ # RDP questions
+ USERDP = N_("Use graphical mode via Remote Desktop Protocol")
  USETEXT = N_("Use text mode")
 diff --git a/pyanaconda/ui/gui/spokes/datetime_spoke.py b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-index 2e0bc2ec21..c92c227700 100644
+index 96ab5bda25..e218e84742 100644
 --- a/pyanaconda/ui/gui/spokes/datetime_spoke.py
 +++ b/pyanaconda/ui/gui/spokes/datetime_spoke.py
-@@ -58,7 +58,7 @@ log = get_module_logger(__name__)
+@@ -63,7 +63,7 @@ log = get_module_logger(__name__)
  
  __all__ = ["DatetimeSpoke"]
  
@@ -51,10 +55,10 @@ index 2e0bc2ec21..c92c227700 100644
  SPLIT_NUMBER_SUFFIX_RE = re.compile(r'([^0-9]*)([-+])([0-9]+)')
  
 diff --git a/pyanaconda/ui/tui/spokes/time_spoke.py b/pyanaconda/ui/tui/spokes/time_spoke.py
-index 755ea9043a..8a31913ef5 100644
+index 60871674b5..efbe6c7498 100644
 --- a/pyanaconda/ui/tui/spokes/time_spoke.py
 +++ b/pyanaconda/ui/tui/spokes/time_spoke.py
-@@ -125,7 +125,7 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+@@ -124,7 +124,7 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
          if kickstart_timezone:
              return _("%s timezone") % kickstart_timezone
          else:
@@ -63,7 +67,7 @@ index 755ea9043a..8a31913ef5 100644
  
      def _summary_text(self):
          """Return summary of current timezone & NTP configuration.
-@@ -172,11 +172,6 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
+@@ -171,11 +171,6 @@ class TimeSpoke(FirstbootSpokeMixIn, NormalTUISpoke):
              callback=self._timezone_callback
          )
  
