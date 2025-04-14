@@ -12,12 +12,15 @@ Update file path for anaconda 37.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
+Rebase for anaconda 42 on 20250414.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
  data/profile.d/fedora.conf | 4 ----
  1 file changed, 4 deletions(-)
 
 diff --git a/data/profile.d/fedora.conf b/data/profile.d/fedora.conf
-index d4fe6d0f26..73c3123a36 100644
+index 6c074df73b..97112ad12d 100644
 --- a/data/profile.d/fedora.conf
 +++ b/data/profile.d/fedora.conf
 @@ -14,10 +14,6 @@ default_on_boot = FIRST_WIRED_WITH_LINK
@@ -29,5 +32,5 @@ index d4fe6d0f26..73c3123a36 100644
 -btrfs_compression = zstd:1
 -
  [User Interface]
- help_directory = /usr/share/anaconda/help/fedora
  custom_stylesheet = /usr/share/anaconda/pixmaps/fedora.css
+ 
