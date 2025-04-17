@@ -10,9 +10,7 @@ REQUIRED_DISTRO_FEATURES = "wayland"
 RDEPENDS:packagegroup-installer-wayland-anaconda = "\
     dbus \
     liberation-fonts \
-    settings-daemon \
     libsdl2 \
-    metacity \
     adwaita-icon-theme \
     pango \
     pango-modules \
