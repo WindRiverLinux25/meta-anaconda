@@ -48,7 +48,6 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedor
            file://0054-tweak-MAX_TREEINFO_DOWNLOAD_RETRIES.patch \
            file://0055-tweak-time-setting.patch \
            file://0056-Add-dracut-args-for-home-to-bootloader.patch \
-           file://0057-do-not-customize-window-theme.patch \
            file://0058-tweak-product-short-name.patch \
            file://0060-tweak-shebang-of-bash.patch \
            file://0061-Tweak-label-name.patch \
