@@ -115,6 +115,7 @@ FILES:${PN} = "${PYTHON_SITEPACKAGES_DIR}/pyanaconda \
                ${datadir}/glade \
                ${datadir}/polkit-1 \
                ${libdir} \
+               ${nonarch_libdir} \
                ${libexecdir} \
                ${sbindir} \
                ${sysconfdir} \
