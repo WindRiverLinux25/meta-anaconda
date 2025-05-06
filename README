@@ -165,7 +165,7 @@ Building the target installer
            Edit conf/local.conf to use:
            $ echo 'PACKAGE_CLASSES = "package_rpm"' >> conf/local.conf
            $ echo 'DISTRO = "anaconda"' >> conf/local.conf
-           $ echo 'INSTALLER_TARGET_BUILD = "<target_build>/tmp-glibc/deploy/images/qemux86/core-image-minimal-qemux86.rootfs.ext4"' >> conf/local.conf
+           $ echo 'INSTALLER_TARGET_BUILD = "<target_build>/tmp/deploy/images/qemux86/core-image-minimal-qemux86.rootfs.ext4"' >> conf/local.conf
 
            Edit conf/bblayers.conf to include other layers
            BBLAYERS ?= " \
@@ -227,7 +227,7 @@ Building the target installer
        Build target installer with machine of qemux86
 
        Create the qemu disk:
-       $ <installer_build>/tmp-glibc/sysroots-components/x86_64/qemu-system-native/usr/bin/qemu-img create -f qcow hd0.vdisk 5000M
+       $ <installer_build>/tmp/sysroots-components/x86_64/qemu-system-native/usr/bin/qemu-img create -f qcow hd0.vdisk 5000M
 
        Start qemu with installer image:
        $ runqemu qemux86 core-image-anaconda iso slirp kvm qemuparams="-drive file=hd0.vdisk,if=virtio,format=qcow"
@@ -332,8 +332,8 @@ Building the target installer
    bitbake package-index
 
    There is a repodata in deploy dir:
-   $ find tmp-glibc/deploy/rpm/ -name repodata
-   tmp-glibc/deploy/rpm/repodata
+   $ find tmp/deploy/rpm/ -name repodata
+   tmp/deploy/rpm/repodata
 
 9. Put multiple target builds into one installer image
    9.1 Create and build multiple target build projects.
