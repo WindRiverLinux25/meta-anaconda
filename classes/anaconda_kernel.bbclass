@@ -9,5 +9,6 @@ SRC_URI:append = " \
 
 KERNEL_FEATURES:append = " \
     features/overlayfs/overlayfs.scc \
+    features/drm-bochs/drm-bochs.scc \
     cfg/systemd.scc \
 "
