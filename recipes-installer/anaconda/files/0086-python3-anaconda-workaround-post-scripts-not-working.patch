@@ -1,0 +1,156 @@
+From 4f1f6735c631fd2f19add25ae0c7a8db0bf00c25 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 8 May 2025 00:14:16 +0800
+Subject: [PATCH] workaround post-scripts not working
+
+Due to upstream applied commit [Migrate the %pre-install, %post, %onerror
+and %traceback scripts][1], the post-scripts does not work as expected,
+partly revert [1] as workaround
+
+[1] https://github.com/rhinstaller/anaconda/commit/fa0be374c096a0a05c827462f8e99361dcf37a27
+
+Upstream-Status: Pending
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ pyanaconda/installation.py | 18 ++++++++++--------
+ pyanaconda/kickstart.py    | 30 +++++++++++++++++++++++++++++-
+ pyanaconda/rescue.py       | 13 ++-----------
+ 3 files changed, 41 insertions(+), 20 deletions(-)
+
+diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
+index facc40b..8cece2a 100644
+--- a/pyanaconda/installation.py
++++ b/pyanaconda/installation.py
+@@ -41,6 +41,7 @@ from pyanaconda.core.i18n import _
+ from pyanaconda.core.path import open_with_perm
+ from pyanaconda.core.service import is_service_installed
+ from pyanaconda.core.threads import thread_manager
++from pyanaconda.kickstart import runPostScripts, runPreInstallScripts
+ from pyanaconda.installation_tasks import DBusTask, Task, TaskQueue
+ from pyanaconda.kexec import setup_kexec
+ from pyanaconda.modules.boss.install_manager.installation_category_interface import (
+@@ -328,10 +329,11 @@ class RunInstallationTask(InstallationTask):
+             _("Running post-installation scripts"),
+             CATEGORY_SYSTEM
+         )
+-        scripts_proxy = RUNTIME.get_proxy(SCRIPTS)
+-        post_scripts.append_dbus_tasks(RUNTIME, [
+-            scripts_proxy.RunScriptsWithTask(KS_SCRIPT_POST)
+-        ])
++        post_scripts.append(Task(
++            "Run post installation scripts",
++            runPostScripts,
++            (ksdata.scripts,)
++        ))
+         configuration_queue.append(post_scripts)
+ 
+         boss_proxy = BOSS.get_proxy()
+@@ -413,10 +415,10 @@ class RunInstallationTask(InstallationTask):
+             _("Running pre-installation scripts"),
+             CATEGORY_ENVIRONMENT
+         )
+-        scripts_proxy = RUNTIME.get_proxy(SCRIPTS)
+-        pre_install_scripts.append_dbus_tasks(RUNTIME, [
+-            scripts_proxy.RunScriptsWithTask(KS_SCRIPT_PREINSTALL)
+-        ])
++        pre_install_scripts.append(Task(
++            "Run %pre-install scripts",
++            runPreInstallScripts, (ksdata.scripts,)
++        ))
+         installation_queue.append(pre_install_scripts)
+ 
+         # Do various pre-installation tasks
+diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
+index 1172ad8..f179196 100644
+--- a/pyanaconda/kickstart.py
++++ b/pyanaconda/kickstart.py
+@@ -25,7 +25,7 @@ import warnings
+ from contextlib import contextmanager
+ 
+ from pykickstart.base import KickstartCommand, RemovedCommand
+-from pykickstart.constants import KS_SCRIPT_PRE
++from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_PREINSTALL
+ from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
+ from pykickstart.ko import KickstartObject
+ from pykickstart.parser import KickstartParser
+@@ -47,6 +47,7 @@ from pyanaconda.core.constants import IPMI_ABORTED
+ from pyanaconda.core.i18n import _
+ from pyanaconda.core.kickstart import VERSION
+ from pyanaconda.core.kickstart import commands as COMMANDS
++from pyanaconda.core.configuration.anaconda import conf
+ from pyanaconda.core.kickstart.scripts import run_script
+ from pyanaconda.core.kickstart.specification import KickstartSpecification
+ from pyanaconda.errors import ScriptError, errorHandler
+@@ -382,6 +383,19 @@ def appendPostScripts(ksdata):
+     ksparser = AnacondaKSParser(ksdata, scriptClass=AnacondaInternalScript)
+     ksparser.readKickstartFromString(scripts, reset=False)
+ 
++
++def runPostScripts(scripts):
++    postScripts = [s for s in scripts if s.type == KS_SCRIPT_POST]
++
++    if len(postScripts) == 0:
++        return
++
++    script_log.info("Running kickstart %%post script(s)")
++    for script in postScripts:
++        script.run(conf.target.system_root)
++    script_log.info("All kickstart %%post script(s) have been run")
++
++
+ def runPreScripts(scripts):
+     preScripts = [s for s in scripts if s.type == KS_SCRIPT_PRE]
+ 
+@@ -395,3 +409,17 @@ def runPreScripts(scripts):
+         script.run("/")
+ 
+     script_log.info("All kickstart %%pre script(s) have been run")
++
++
++def runPreInstallScripts(scripts):
++    preInstallScripts = [s for s in scripts if s.type == KS_SCRIPT_PREINSTALL]
++
++    if len(preInstallScripts) == 0:
++        return
++
++    script_log.info("Running kickstart %%pre-install script(s)")
++
++    for script in preInstallScripts:
++        script.run("/")
++
++    script_log.info("All kickstart %%pre-install script(s) have been run")
+diff --git a/pyanaconda/rescue.py b/pyanaconda/rescue.py
+index cd8e619..ad4e8dd 100644
+--- a/pyanaconda/rescue.py
++++ b/pyanaconda/rescue.py
+@@ -55,6 +55,7 @@ from pyanaconda.modules.common.structures.storage import (
+     OSData,
+ )
+ from pyanaconda.modules.common.task import sync_run_task
++from pyanaconda.kickstart import runPostScripts
+ from pyanaconda.ui.tui import tui_quit_callback
+ from pyanaconda.ui.tui.spokes import NormalTUISpoke
+ 
+@@ -254,17 +255,7 @@ class Rescue:
+ 
+         # run %post if we've mounted everything
+         if not self.ro and self._scripts:
+-            scripts_proxy = RUNTIME.get_proxy(SCRIPTS)
+-            post_task_path = scripts_proxy.RunScriptsWithTask(KS_SCRIPT_POST)
+-            post_task_proxy = RUNTIME.get_proxy(post_task_path)
+-            try:
+-                sync_run_task(post_task_proxy)
+-            except ScriptError as e:
+-                flags.ksprompt = True
+-                errorHandler.cb(e)
+-                util.ipmi_report(IPMI_ABORTED)
+-                sys.exit(0)
+-            pass
++            runPostScripts(self._scripts)
+ 
+         self.status = RescueModeStatus.MOUNTED
+         return True
+-- 
+2.34.1
+

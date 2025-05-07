@@ -69,6 +69,7 @@ SRC_URI = "git://github.com/rhinstaller/anaconda.git;protocol=https;branch=fedor
            file://0083-reset-default-autopart-type.patch \
            file://0084-conf-system-not-livecd.patch \
            file://0085-catch-all-exceptions-for-screensaver-inhibition.patch \
+           file://0086-python3-anaconda-workaround-post-scripts-not-working.patch \
            "
 
 SRCREV = "b42eeabf535c3cf61ca8fafee7c21a156e650c74"
