@@ -158,8 +158,10 @@ FOE
 
        if [ -n "$textinst" ]; then
            anaconda_opts="$anaconda_opts --text"
-	   # Quiet kernel logs, this can be undone in a kickstart file
-	   echo 1 > /proc/sys/kernel/printk
+           # Quiet kernel logs, this can be undone in a kickstart file
+           echo 1 > /proc/sys/kernel/printk
+       else
+           systemctl start weston.service
        fi
 
        if [ -n "$vncpassword" ]; then
