@@ -2,6 +2,7 @@ RPM_POSTPROCESS_COMMANDS:append = "wrl_installer;"
 do_rootfs[vardeps] += "INSTALLER_CONF \
                        INSTALLER_TARGET_BUILD \
                        INSTALLER_TARGET_IMAGE \
+                       INSTALLER_ARCH \
                        KICKSTART_FILE \
                        "
 
@@ -233,12 +234,15 @@ wrl_installer_get_count() {
     echo $sum
 }
 
+INSTALLER_ARCH ?= "${TARGET_ARCH}"
+INSTALLER_ARCH:qemux86 = "i386"
+
 wrl_installer[vardepsexclude] = "DATETIME"
 wrl_installer() {
     cat >${IMAGE_ROOTFS}/.discinfo <<_EOF
 ${DATETIME}
 ${DISTRO_NAME} ${DISTRO_VERSION}
-${TARGET_ARCH}
+${INSTALLER_ARCH}
 _EOF
 
     : > ${IMAGE_ROOTFS}/.target_build_list
@@ -262,7 +266,7 @@ Product=${INSTPRODUCT}
 Version=${INSTVER}
 BugURL=${INSTBUGURL}
 IsFinal=True
-UUID=${DATETIME}.${TARGET_ARCH}
+UUID=${DATETIME}.${INSTALLER_ARCH}
 _EOF
 	    fi
 
