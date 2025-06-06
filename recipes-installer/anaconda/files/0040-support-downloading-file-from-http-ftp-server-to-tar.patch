@@ -1,6 +1,6 @@
-From 4c891449e324d3a78ddf7722fd7805bae2e1cbfb Mon Sep 17 00:00:00 2001
+From fe6669123f81bb59216a71e37dace53dc473b78f Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Sat, 29 Jun 2019 15:06:40 +0800
+Date: Thu, 5 Jun 2025 15:05:19 +0800
 Subject: [PATCH] support downloading file from http/ftp server to target image
 
 Add key in kickstart to support downloading file from http/ftp server to target image,
@@ -25,22 +25,22 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
 Rebase for anaconda 37.
 
-Signed-off-by: Kai Kang <kai.kang@windriver.com>
-
 Rebase for anaconda 38 on 20231107.
-
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for anaconda 42 on 20250605.
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  pyanaconda/installation.py |   6 +++
- pyanaconda/kickstart.py    | 100 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 106 insertions(+)
+ pyanaconda/kickstart.py    | 105 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 111 insertions(+)
 
 diff --git a/pyanaconda/installation.py b/pyanaconda/installation.py
-index 9c1372f606..803687d11d 100644
+index 8cece2a..64a4b83 100644
 --- a/pyanaconda/installation.py
 +++ b/pyanaconda/installation.py
-@@ -184,6 +184,12 @@ class RunInstallationTask(InstallationTask):
-             _("Configuring addons")
+@@ -240,6 +240,12 @@ class RunInstallationTask(InstallationTask):
+             CATEGORY_SYSTEM
          )
  
 +        addon_config.append(Task(
@@ -53,27 +53,28 @@ index 9c1372f606..803687d11d 100644
          for service_name, object_path in boss_proxy.CollectInstallSystemTasks():
              task_proxy = DBus.get_proxy(service_name, object_path)
 diff --git a/pyanaconda/kickstart.py b/pyanaconda/kickstart.py
-index 9f235c1d58..df31b8e44c 100644
+index f179196..e4be15c 100644
 --- a/pyanaconda/kickstart.py
 +++ b/pyanaconda/kickstart.py
-@@ -25,6 +25,7 @@ import sys
- import tempfile
+@@ -22,6 +22,8 @@ import glob
+ import sys
  import time
  import warnings
 +import requests
- 
++import os
  from contextlib import contextmanager
  
-@@ -45,6 +46,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_TRACE
+ from pykickstart.base import KickstartCommand, RemovedCommand
+@@ -29,6 +31,8 @@ from pykickstart.constants import KS_SCRIPT_POST, KS_SCRIPT_PRE, KS_SCRIPT_PREIN
  from pykickstart.errors import KickstartError, KickstartParseWarning, KickstartAuthError
  from pykickstart.ko import KickstartObject
  from pykickstart.parser import KickstartParser
 +from pykickstart.base import KickstartCommand, BaseData
 +from pykickstart.options import KSOptionParser
  from pykickstart.parser import Script as KSScript
- from pykickstart.sections import NullSection, PostScriptSection, PreScriptSection, \
-     PreInstallScriptSection, OnErrorScriptSection, TracebackScriptSection, Section
-@@ -181,6 +184,101 @@ class UselessObject(KickstartObject):
+ from pykickstart.sections import (
+     NullSection,
+@@ -145,6 +149,101 @@ class UselessObject(KickstartObject):
          """Generate this part of a kickstart file from the DBus module."""
          return ""
  
@@ -175,19 +176,21 @@ index 9f235c1d58..df31b8e44c 100644
  ###
  ### HANDLERS
  ###
-@@ -208,11 +306,13 @@ class AnacondaKickstartSpecification(KickstartSpecification):
-         "text": COMMANDS.DisplayMode,
-         "updates": COMMANDS.Updates,
-         "vnc": COMMANDS.Vnc,
+@@ -159,8 +258,14 @@ class AnacondaKickstartSpecification(KickstartSpecification):
+         "poweroff": COMMANDS.Reboot,
+         "reboot": COMMANDS.Reboot,
+         "shutdown": COMMANDS.Reboot,
 +        "download": Download,
      }
  
-     commands_data = {
-         "DriverDiskData": COMMANDS.DriverDiskData,
-         "SshPwData": COMMANDS.SshPwData,
++    commands_data = {
 +        "DownloadData": DownloadData,
-     }
- 
++    }
++
++
      @classmethod
+     def generate_command_map(cls, handler):
+         """Generate a command map.
 -- 
-2.7.4
+2.34.1
+
